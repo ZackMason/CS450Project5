@@ -1,1 +1,1 @@
-cmake --build build --config Release
+cmake --build build --target game --config Release -j 12
