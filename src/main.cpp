@@ -32,10 +32,8 @@
 
 struct vertex_t {
     v3f p;
-    v3f n;
     v2f t;
 };
-
 
 constexpr f32    WALL_HEIGHT        = 20.0f;
 constexpr size_t WALL_COUNT         = 4;
@@ -83,7 +81,7 @@ int run() {
     });
 
     window.open_window();
-    window.set_vsync(false);
+    // window.set_vsync(false);
     window.set_title("CS450 Project 5");
     window.make_imgui_context();
     
@@ -101,7 +99,7 @@ int run() {
     vertex_t* vertices = vertex_buffer.get_data();
     u32* tris = tris_buffer.get_data();
 
-    const auto i_2d = [w=TERRAIN_ROW_COUNT](size_t x, size_t y) ->u32 {
+    const auto i_2d = [w=TERRAIN_ROW_COUNT](size_t x, size_t y) -> u32 {
         return y*w+x;
     };
 
@@ -112,7 +110,6 @@ int run() {
         for (size_t x = 0; x < TERRAIN_ROW_COUNT; x++) {
             vertex_t vertex;
             vertex.p = (v3f{x, 0.0f, y} * VERTEX_SPACING) - v3f{terrain_size.x, 0.0f, terrain_size.y} * 0.5f;
-            vertex.n = v3f{0.0f, 1.0f, 0.0f};
             vertex.t = v2f{x, y} / v2f{TERRAIN_ROW_COUNT-1, TERRAIN_COL_COUNT-1}; 
 
             vertices[vertex_count++] = vertex;
@@ -141,10 +138,10 @@ int run() {
         const v3f p4 = p0 + t * dist + bt * dist * WALL_HEIGHT;
 
         const auto v_s = vertex_count;
-        vertices[vertex_count++] = vertex_t{p1, n, v2f{0.0}};
-        vertices[vertex_count++] = vertex_t{p2, n, v2f{0.0}};
-        vertices[vertex_count++] = vertex_t{p3, n, v2f{0.0}};
-        vertices[vertex_count++] = vertex_t{p4, n, v2f{0.0}};
+        vertices[vertex_count++] = vertex_t{p1, v2f{0.0}};
+        vertices[vertex_count++] = vertex_t{p2, v2f{0.0}};
+        vertices[vertex_count++] = vertex_t{p3, v2f{0.0}};
+        vertices[vertex_count++] = vertex_t{p4, v2f{0.0}};
 
         tris[tri_count++] = v_s;
         tris[tri_count++] = v_s + 1;
@@ -166,8 +163,7 @@ int run() {
     vertex_array_t vertex_array{vertex_buffer.id, tris_buffer.id, tri_count, sizeof(vertex_t)};
     vertex_array
         .set_attrib(0, 3, GL_FLOAT, offsetof(vertex_t, p))
-        .set_attrib(1, 3, GL_FLOAT, offsetof(vertex_t, n))
-        .set_attrib(2, 2, GL_FLOAT, offsetof(vertex_t, t));
+        .set_attrib(1, 2, GL_FLOAT, offsetof(vertex_t, t));
     transform_t model;
 
     puts("Created Mesh\n");

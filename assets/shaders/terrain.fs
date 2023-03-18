@@ -5,7 +5,6 @@ out vec4 FragColor;
 
 in VS_OUT {
     vec3 pos;
-    vec3 nrm;
     vec2 tex;
 } fs_in;
 uniform vec3 uCamPos;
@@ -35,6 +34,9 @@ float grid(in vec3 v) {
 
 #include <heightmap.glsl>
 
+// filament light model 
+// https://google.github.io/filament/Filament.md.html
+// LICENSE: https://github.com/google/filament/blob/main/LICENSE
 vec3 filament_Schlick(const vec3 f0, float VoH) {
     float f = pow(1.0 - VoH, 5.0);
     return f + f0 * (1.0 - f);
@@ -72,7 +74,10 @@ float filament_Burley(float roughness, float NoV, float NoL, float LoH) {
 void main() {
     vec4 color = vec4(1,0,0,1);
     
-    vec3 normal =  shape_normal(fs_in.pos, fs_in.tex, uFragTime);
+    vec3 normal = vec3(0,1,0);
+    if (uState.height > 0.0) {
+        normal = shape_normal(fs_in.pos, fs_in.tex, uFragTime);
+    } 
 
     vec3 v = normalize(uCamPos - fs_in.pos);
 
